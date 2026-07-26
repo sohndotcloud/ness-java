@@ -12,18 +12,25 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
-          java-version: '25'
+          java-version: '21'
           cache: maven
 
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
+
+      - name: Debug - check jar contents
+        run: |
+          echo "=== Jar contents (migration files) ==="
+          unzip -l target/*.jar | grep -i migration || echo "NO MIGRATION FILES FOUND IN JAR"
+          echo "=== Full BOOT-INF/classes/db tree ==="
+          unzip -l target/*.jar | grep "BOOT-INF/classes/db" || echo "NO db FOLDER FOUND IN JAR AT ALL"
 
       - name: Prepare deployment package
         run: |
           mkdir deploy
           JAR_FILE=$(find target -maxdepth 1 -name '*.jar' ! -name '*-sources.jar' | head -n 1)
           cp "$JAR_FILE" deploy/app.jar
-          echo "web: java -jar app.jar" > deploy/Procfile
+          echo "web: java -jar app.jar --server.port=5000" > deploy/Procfile
           cd deploy && zip -r ../deploy.zip .
 
       - name: Deploy to EB
