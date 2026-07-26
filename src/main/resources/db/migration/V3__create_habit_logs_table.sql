@@ -4,4 +4,5 @@ CREATE TABLE habit_logs (
                             log_date DATE NOT NULL,
                             completed_count INT NOT NULL DEFAULT 0,
                             logged_at TIMESTAMP NOT NULL DEFAULT now()
+
 );
