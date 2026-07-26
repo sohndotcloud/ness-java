@@ -103,4 +103,8 @@ public class Habit {
     public void setLogs(List<HabitLog> logs) {
         this.logs = logs;
     }
+
+    public UUID getId() {
+        return id;
+    }
 }

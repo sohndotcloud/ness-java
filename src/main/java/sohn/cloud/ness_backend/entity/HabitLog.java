@@ -72,4 +72,8 @@ public class HabitLog {
     public void setNote(String note) {
         this.note = note;
     }
+
+    public UUID getId() {
+        return id;
+    }
 }
