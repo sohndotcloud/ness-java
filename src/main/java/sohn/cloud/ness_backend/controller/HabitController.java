@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/habits")
+@RequestMapping("/habits")
 public class HabitController {
 
     private final HabitRepository habitRepository;
@@ -53,7 +53,7 @@ public class HabitController {
 
         Habit saved = habitRepository.save(habit);
         return ResponseEntity
-            .created(URI.create("/api/habits/" + saved.getId()))
+            .created(URI.create("/habits/" + saved.getId()))
             .body(HabitResponse.from(saved));
     }
 

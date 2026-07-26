@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -36,7 +36,7 @@ public class UserController {
 
         User saved = userRepository.save(user);
         return ResponseEntity
-            .created(URI.create("/api/users/" + saved.getId()))
+            .created(URI.create("/users/" + saved.getId()))
             .body(UserResponse.from(saved));
     }
 

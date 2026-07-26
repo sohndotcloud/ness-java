@@ -14,10 +14,10 @@ import java.util.Date;
 @Component
 public class JwtService {
 
-    @Value("${jwt.secret}")
+    @Value("${app.jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-ms:86400000}") // 24h default
+    @Value("${app.jwt.expiration-ms:86400000}") // 24h default
     private long expirationMs;
 
     private SecretKey getSigningKey() {
