@@ -53,7 +53,7 @@ public class HabitController {
 
         Habit saved = habitRepository.save(habit);
         return ResponseEntity
-            .created(URI.create("/api/habits/" + saved.getId()))
+            .created(URI.create("/habits/" + saved.getId()))
             .body(HabitResponse.from(saved));
     }
 

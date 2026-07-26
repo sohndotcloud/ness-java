@@ -36,7 +36,7 @@ public class UserController {
 
         User saved = userRepository.save(user);
         return ResponseEntity
-            .created(URI.create("/api/users/" + saved.getId()))
+            .created(URI.create("/users/" + saved.getId()))
             .body(UserResponse.from(saved));
     }
 
