@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/habits/{habitId}/logs")
+@RequestMapping("/habits/{habitId}/logs")
 public class HabitLogController {
 
     private final HabitLogService habitLogService;

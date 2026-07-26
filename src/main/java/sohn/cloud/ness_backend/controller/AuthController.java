@@ -20,7 +20,7 @@ import sohn.cloud.ness_backend.security.JwtService;
 import sohn.cloud.ness_backend.security.UserPrincipal;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final UserRepository userRepository;
