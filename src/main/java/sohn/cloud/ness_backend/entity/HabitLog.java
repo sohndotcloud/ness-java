@@ -31,6 +31,7 @@ public class HabitLog {
     @Column(name = "completed_count", nullable = false)
     private Integer completedCount = 0;
 
+    @Column
     private String note;
 
     public Habit getHabit() {
