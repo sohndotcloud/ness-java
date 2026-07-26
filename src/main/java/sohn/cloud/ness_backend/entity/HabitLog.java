@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
 @Entity
 @Table(
     name = "habit_logs",
@@ -34,4 +33,43 @@ public class HabitLog {
 
     private String note;
 
+    public Habit getHabit() {
+        return habit;
+    }
+
+    public void setHabit(Habit habit) {
+        this.habit = habit;
+    }
+
+    public Instant getLoggedAt() {
+        return loggedAt;
+    }
+
+    public void setLoggedAt(Instant loggedAt) {
+        this.loggedAt = loggedAt;
+    }
+
+    public LocalDate getLogDate() {
+        return logDate;
+    }
+
+    public void setLogDate(LocalDate logDate) {
+        this.logDate = logDate;
+    }
+
+    public Integer getCompletedCount() {
+        return completedCount;
+    }
+
+    public void setCompletedCount(Integer completedCount) {
+        this.completedCount = completedCount;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }

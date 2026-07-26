@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
 @Table(name = "habits")
 public class Habit {
@@ -41,5 +40,67 @@ public class Habit {
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HabitLog> logs = new ArrayList<>();
 
-    // getters/setters
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public Integer getTargetCount() {
+        return targetCount;
+    }
+
+    public void setTargetCount(Integer targetCount) {
+        this.targetCount = targetCount;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<HabitLog> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<HabitLog> logs) {
+        this.logs = logs;
+    }
 }
