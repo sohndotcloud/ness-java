@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // NEW — let preflight through unauthenticated
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
