@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NessBackendApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("java.security.egd", "file:/dev/./urandom");
 		SpringApplication.run(NessBackendApplication.class, args);
 	}
 
