@@ -55,15 +55,14 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // NEW — tells Spring what cross-origin requests are allowed. Security's
-    // .cors(Customizer.withDefaults()) call below picks this bean up by type.
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(allowedOrigin));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Content-Type", "Authorization"));
-        config.setAllowCredentials(false); // you're using a bearer token, not cookies
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
