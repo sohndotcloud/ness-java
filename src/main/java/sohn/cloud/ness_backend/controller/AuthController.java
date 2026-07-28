@@ -1,21 +1,19 @@
 package sohn.cloud.ness_backend.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import jakarta.servlet.http.HttpServletRequest;
 
 import sohn.cloud.ness_backend.dto.AuthResponse;
 import sohn.cloud.ness_backend.dto.LoginRequest;
 import sohn.cloud.ness_backend.dto.RegisterRequest;
-import sohn.cloud.ness_backend.dto.RefreshRequest;
 import sohn.cloud.ness_backend.entity.User;
 import sohn.cloud.ness_backend.repo.UserRepository;
 import sohn.cloud.ness_backend.security.AppUserDetailsService;
@@ -23,9 +21,13 @@ import sohn.cloud.ness_backend.security.JwtService;
 import sohn.cloud.ness_backend.security.UserPrincipal;
 import sohn.cloud.ness_backend.service.SessionService;
 
+import java.time.Duration;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final String REFRESH_COOKIE_NAME = "refreshToken";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -70,7 +72,11 @@ public class AuthController {
                 httpRequest.getRemoteAddr()
         );
 
-        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+        ResponseCookie cookie = buildRefreshCookie(refreshToken, Duration.ofDays(30));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new AuthResponse(accessToken));
     }
 
     @PostMapping("/login")
@@ -89,15 +95,25 @@ public class AuthController {
                 httpRequest.getRemoteAddr()
         );
 
-        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
+        ResponseCookie cookie = buildRefreshCookie(refreshToken, Duration.ofDays(30));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new AuthResponse(accessToken));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request,
-                                                HttpServletRequest httpRequest) {
+    public ResponseEntity<AuthResponse> refresh(
+            @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshToken,
+            HttpServletRequest httpRequest) {
+
+        if (refreshToken == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing refresh token");
+        }
+
         try {
             SessionService.RotatedSession rotated = sessionService.rotateSession(
-                    request.refreshToken(),
+                    refreshToken,
                     httpRequest.getHeader("User-Agent"),
                     httpRequest.getRemoteAddr()
             );
@@ -106,16 +122,41 @@ public class AuthController {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
             String newAccessToken = jwtService.generateToken(new UserPrincipal(user));
+            ResponseCookie cookie = buildRefreshCookie(rotated.rawRefreshToken(), Duration.ofDays(30));
 
-            return ResponseEntity.ok(new AuthResponse(newAccessToken, rotated.rawRefreshToken()));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(new AuthResponse(newAccessToken));
         } catch (SecurityException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+            ResponseCookie expiredCookie = buildRefreshCookie("", Duration.ZERO);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                    .build();
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody RefreshRequest request) {
-        sessionService.revokeSession(request.refreshToken());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshToken) {
+
+        if (refreshToken != null) {
+            sessionService.revokeSession(refreshToken);
+        }
+
+        ResponseCookie expiredCookie = buildRefreshCookie("", Duration.ZERO);
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .build();
+    }
+
+    private ResponseCookie buildRefreshCookie(String value, Duration maxAge) {
+        return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
+                .httpOnly(true)
+                .secure(true) // requires HTTPS — only disable for local http-only dev
+                .sameSite("Strict")
+                .path("/auth")
+                .maxAge(maxAge)
+                .build();
     }
 }

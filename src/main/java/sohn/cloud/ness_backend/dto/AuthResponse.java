@@ -1,3 +1,3 @@
 package sohn.cloud.ness_backend.dto;
 
-public record AuthResponse(String accessToken, String refreshToken) {}
+public record AuthResponse(String accessToken) {}
