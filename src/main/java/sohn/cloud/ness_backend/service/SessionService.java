@@ -1,10 +1,12 @@
 package sohn.cloud.ness_backend.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import sohn.cloud.ness_backend.entity.UserSession;
 import sohn.cloud.ness_backend.repo.UserSessionRepository;
 import sohn.cloud.ness_backend.util.TokenHasher;
 
+import java.beans.Transient;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -69,6 +71,7 @@ public class SessionService {
         return new RotatedSession(newRawToken, existing.getUserId());
     }
 
+    @Transactional
     public void revokeSession(String rawToken) {
         String hash = TokenHasher.hash(rawToken);
         sessionRepository.findByTokenHash(hash).ifPresent(s -> {
@@ -78,10 +81,9 @@ public class SessionService {
         });
     }
 
+    @Transactional
     public void revokeAllForUser(UUID userId) {
         sessionRepository.deleteByUserId(userId);
-        // or, if you prefer an audit trail instead of deletion,
-        // fetch all sessions for the user and mark revoked = true
     }
 
     private String generateSecureToken() {

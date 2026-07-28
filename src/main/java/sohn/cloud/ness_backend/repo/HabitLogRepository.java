@@ -15,4 +15,6 @@ public interface HabitLogRepository extends JpaRepository<HabitLog, UUID> {
     List<HabitLog> findByHabitIdAndLogDateBetweenOrderByLogDateAsc(
         UUID habitId, LocalDate start, LocalDate end
     );
+
+    void deleteByHabitIdAndLogDate(UUID habitId, LocalDate logDate);
 }

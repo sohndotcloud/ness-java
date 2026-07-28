@@ -75,6 +75,8 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // NEW — let preflight through unauthenticated
+                        .requestMatchers(HttpMethod.GET, "/habits/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/habits/**").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/health").permitAll()
                         .anyRequest().authenticated()

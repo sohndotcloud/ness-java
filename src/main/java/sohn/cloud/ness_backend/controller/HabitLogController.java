@@ -1,6 +1,8 @@
 package sohn.cloud.ness_backend.controller;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -64,5 +66,15 @@ public class HabitLogController {
             .stream()
             .map(HabitLogResponse::from)
             .toList();
+    }
+
+    @DeleteMapping("/{logDate}")
+    public ResponseEntity<Void> deleteLog(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable UUID habitId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate logDate
+    ) {
+        habitLogService.deleteLog(habitId, logDate);
+        return ResponseEntity.noContent().build();
     }
 }

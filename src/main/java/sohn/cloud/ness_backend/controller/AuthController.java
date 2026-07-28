@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import sohn.cloud.ness_backend.dto.AuthResponse;
 import sohn.cloud.ness_backend.dto.LoginRequest;
 import sohn.cloud.ness_backend.dto.RegisterRequest;
@@ -58,7 +57,6 @@ public class AuthController {
         if (userRepository.existsByEmail(request.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
-
         User user = new User();
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
@@ -71,7 +69,6 @@ public class AuthController {
                 httpRequest.getHeader("User-Agent"),
                 httpRequest.getRemoteAddr()
         );
-
         ResponseCookie cookie = buildRefreshCookie(refreshToken, Duration.ofDays(30));
 
         return ResponseEntity.ok()
@@ -85,16 +82,13 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
-
         UserPrincipal principal = (UserPrincipal) userDetailsService.loadUserByUsername(request.email());
-
         String accessToken = jwtService.generateToken(principal);
         String refreshToken = sessionService.createSession(
                 principal.getUserId(),
                 httpRequest.getHeader("User-Agent"),
                 httpRequest.getRemoteAddr()
         );
-
         ResponseCookie cookie = buildRefreshCookie(refreshToken, Duration.ofDays(30));
 
         return ResponseEntity.ok()
@@ -102,25 +96,21 @@ public class AuthController {
                 .body(new AuthResponse(accessToken));
     }
 
-    @PostMapping("/refresh")
+    @RequestMapping(value = "/refresh", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<AuthResponse> refresh(
             @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshToken,
             HttpServletRequest httpRequest) {
-
         if (refreshToken == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing refresh token");
         }
-
         try {
             SessionService.RotatedSession rotated = sessionService.rotateSession(
                     refreshToken,
                     httpRequest.getHeader("User-Agent"),
                     httpRequest.getRemoteAddr()
             );
-
             User user = userRepository.findById(rotated.userId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-
             String newAccessToken = jwtService.generateToken(new UserPrincipal(user));
             ResponseCookie cookie = buildRefreshCookie(rotated.rawRefreshToken(), Duration.ofDays(30));
 
@@ -138,13 +128,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
             @CookieValue(name = REFRESH_COOKIE_NAME, required = false) String refreshToken) {
-
         if (refreshToken != null) {
             sessionService.revokeSession(refreshToken);
         }
-
         ResponseCookie expiredCookie = buildRefreshCookie("", Duration.ZERO);
-
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
                 .build();

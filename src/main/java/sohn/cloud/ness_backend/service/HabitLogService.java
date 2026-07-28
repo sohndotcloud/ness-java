@@ -9,6 +9,7 @@ import sohn.cloud.ness_backend.repo.HabitLogRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.UUID;
 
 @Service
 public class HabitLogService {
@@ -34,5 +35,10 @@ public class HabitLogService {
         log.setCompletedCount(log.getCompletedCount() + count);
         log.setLoggedAt(Instant.now());
         return repo.save(log);
+    }
+
+    @Transactional
+    public void deleteLog(UUID habitId, LocalDate logDate) {
+        repo.deleteByHabitIdAndLogDate(habitId, logDate);
     }
 }
