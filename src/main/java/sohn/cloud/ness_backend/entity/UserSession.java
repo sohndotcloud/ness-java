@@ -7,7 +7,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "user_sessions")
 public class UserSession {
-
     @Id
     @GeneratedValue
     private UUID id;
