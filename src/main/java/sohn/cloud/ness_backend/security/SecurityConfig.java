@@ -89,8 +89,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(requestHandler)
-                        // login/register don't ride an existing session cookie, so no CSRF risk there yet
-                        .ignoringRequestMatchers("/auth/login", "/auth/register")
+                        .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/refresh")
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
