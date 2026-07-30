@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -38,6 +39,9 @@ import java.util.List;
 public class SecurityConfig {
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
+
+    @Value("${app.cookie.domain}")
+    private String appCookieDomain;
 
     private final JwtAuthFilter jwtAuthFilter;
     private final AppUserDetailsService userDetailsService;
@@ -79,15 +83,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CsrfTokenRepository csrfTokenRepository) throws Exception {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        // BREACH-protection XOR wrapping isn't needed for a plain cookie-read SPA flow
         requestHandler.setCsrfRequestAttributeName(null);
 
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(requestHandler)
                         .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/refresh")
                 )
@@ -106,6 +109,13 @@ public class SecurityConfig {
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieCustomizer(cookie -> cookie.domain(appCookieDomain));
+        return repository;
     }
 
     private static final class CsrfCookieFilter extends OncePerRequestFilter {
