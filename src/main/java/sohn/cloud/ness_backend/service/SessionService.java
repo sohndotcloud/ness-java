@@ -1,5 +1,6 @@
 package sohn.cloud.ness_backend.service;
 
+import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import sohn.cloud.ness_backend.entity.UserSession;
@@ -44,6 +45,7 @@ public class SessionService {
         return rawToken;
     }
 
+    @Transactional
     public RotatedSession rotateSession(String rawToken, String userAgent, String ipAddress) {
         String incomingHash = TokenHasher.hash(rawToken);
         UserSession existing = sessionRepository.findByTokenHash(incomingHash)
