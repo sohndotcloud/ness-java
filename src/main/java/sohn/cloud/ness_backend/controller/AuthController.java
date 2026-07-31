@@ -11,9 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import sohn.cloud.ness_backend.dto.AuthResponse;
+import sohn.cloud.ness_backend.dto.ErrorResponse;
 import sohn.cloud.ness_backend.dto.LoginRequest;
 import sohn.cloud.ness_backend.dto.RegisterRequest;
 import sohn.cloud.ness_backend.entity.User;
+import sohn.cloud.ness_backend.exception.RegistrationUserExistsException;
 import sohn.cloud.ness_backend.repo.UserRepository;
 import sohn.cloud.ness_backend.security.AppUserDetailsService;
 import sohn.cloud.ness_backend.security.JwtService;
@@ -21,6 +23,7 @@ import sohn.cloud.ness_backend.security.UserPrincipal;
 import sohn.cloud.ness_backend.service.SessionService;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -53,9 +56,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request,
-                                                 HttpServletRequest httpRequest) {
+                                                 HttpServletRequest httpRequest) throws RegistrationUserExistsException {
         if (userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+            throw new RegistrationUserExistsException("Email is already registered.");
         }
         User user = new User();
         user.setEmail(request.email());
@@ -135,6 +138,13 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
                 .build();
+    }
+
+
+    @ExceptionHandler(RegistrationUserExistsException.class)
+    public ResponseEntity<ErrorResponse> handleRegistrationUserExists(RegistrationUserExistsException ex) {
+        ErrorResponse body = new ErrorResponse(HttpStatus.CONFLICT, "User already exists.", LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     private ResponseCookie buildRefreshCookie(String value, Duration maxAge) {

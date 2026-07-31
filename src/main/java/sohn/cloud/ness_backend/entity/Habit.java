@@ -1,7 +1,6 @@
 package sohn.cloud.ness_backend.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.Instant;
 import java.util.ArrayList;
