@@ -1,6 +1,8 @@
 package sohn.cloud.ness_backend.dto;
 
-public record HabitLogRequest(
+import java.time.LocalDate;
 
-    Integer count
+public record HabitLogRequest(
+    Integer count,
+    LocalDate date
 ) {}

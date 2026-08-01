@@ -8,6 +8,7 @@ import sohn.cloud.ness_backend.repo.HabitLogRepository;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
@@ -21,14 +22,14 @@ public class HabitLogService {
     }
 
     @Transactional
-    public HabitLog logCompletion(Habit habit, ZoneId userZone, int count) {
+    public HabitLog logCompletion(Habit habit, LocalDate date, ZoneId userZone, int count) {
         LocalDate today = Instant.now().atZone(userZone).toLocalDate();
 
-        HabitLog log = repo.findByHabitIdAndLogDate(habit.getId(), today)
+        HabitLog log = repo.findByHabitIdAndLogDate(habit.getId(), date)
             .orElseGet(() -> {
                 HabitLog newLog = new HabitLog();
                 newLog.setHabit(habit);
-                newLog.setLogDate(today);
+                newLog.setLogDate(date);
                 return newLog;
             });
 
