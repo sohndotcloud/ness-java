@@ -38,7 +38,6 @@ public class PasswordResetEmailService {
                 .build();
 
         SendEmailResponse response = sesClient.sendEmail(request);
-        System.out.println("Message ID: " + response.messageId());
     }
 
     private Content ContentBuilder(String data) {
