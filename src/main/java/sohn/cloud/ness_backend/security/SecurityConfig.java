@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 @Configuration
@@ -92,8 +93,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/refresh")
-                )
+                        .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/refresh", "/auth/password-reset/request", "/auth/password-reset/confirm")                )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -113,8 +113,9 @@ public class SecurityConfig {
 
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
+        String domain = URI.create(appCookieDomain).getHost(); // "localhost"
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repository.setCookieCustomizer(cookie -> cookie.domain(appCookieDomain));
+        repository.setCookieCustomizer(cookie -> cookie.domain(domain));
         return repository;
     }
 
