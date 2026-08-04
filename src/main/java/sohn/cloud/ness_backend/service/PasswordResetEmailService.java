@@ -22,22 +22,23 @@ public class PasswordResetEmailService {
         String text = buildText(name, resetLink);
 
         EmailContent content = EmailContent.builder()
-            .simple(Message.builder()
-                .subject(ContentBuilder("Reset your Ness password"))
-                .body(Body.builder()
-                    .html(ContentBuilder(html))
-                    .text(ContentBuilder(text))
-                    .build())
-                .build())
-            .build();
+                .simple(Message.builder()
+                        .subject(ContentBuilder("Reset your Ness password"))
+                        .body(Body.builder()
+                                .html(ContentBuilder(html))
+                                .text(ContentBuilder(text))
+                                .build())
+                        .build())
+                .build();
 
         SendEmailRequest request = SendEmailRequest.builder()
-            .fromEmailAddress(fromAddress)
-            .destination(Destination.builder().toAddresses(toEmail).build())
-            .content(content)
-            .build();
+                .fromEmailAddress(fromAddress)
+                .destination(Destination.builder().toAddresses(toEmail).build())
+                .content(content)
+                .build();
 
         SendEmailResponse response = sesClient.sendEmail(request);
+        System.out.println("Message ID: " + response.messageId());
     }
 
     private Content ContentBuilder(String data) {
@@ -60,6 +61,6 @@ public class PasswordResetEmailService {
 
     private String buildText(String name, String resetLink) {
         return "Hi %s, reset your password here: %s (expires in 30 minutes). If you did not request this, ignore this email."
-            .formatted(name, resetLink);
+                .formatted(name, resetLink);
     }
 }
