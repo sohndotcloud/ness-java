@@ -4,7 +4,6 @@ target/
 !**/src/test/**/target/
 .kotlin
 .env
-**/resources/application-local.properties
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

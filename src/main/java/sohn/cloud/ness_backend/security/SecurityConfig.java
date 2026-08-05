@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(csrfTokenRepository)
                         .csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/refresh", "/auth/password-reset/request", "/auth/password-reset/confirm")                )
+                        .ignoringRequestMatchers("/auth/login", "/auth/register", "/auth/logout" "/auth/refresh", "/auth/password-reset/request", "/auth/password-reset/confirm")                )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
