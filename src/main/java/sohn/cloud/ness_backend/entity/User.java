@@ -30,6 +30,9 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     public String getEmail() {
         return email;
     }
@@ -72,5 +75,13 @@ public class User {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

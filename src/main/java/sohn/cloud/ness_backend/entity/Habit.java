@@ -3,9 +3,7 @@ package sohn.cloud.ness_backend.entity;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "habits")
@@ -38,6 +36,22 @@ public class Habit {
 
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HabitLog> logs = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "habit_signal_contacts",
+            joinColumns = @JoinColumn(name = "habit_id"),
+            inverseJoinColumns = @JoinColumn(name = "signal_contact_id")
+    )
+    private Set<SignalContact> signalContacts = new HashSet<>();
+
+    public Set<SignalContact> getSignalContacts() {
+        return signalContacts;
+    }
+
+    public void setSignalContacts(Set<SignalContact> signalContacts) {
+        this.signalContacts = signalContacts;
+    }
 
     public User getUser() {
         return user;

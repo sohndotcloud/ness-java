@@ -75,9 +75,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(allowedOrigin));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // X-XSRF-TOKEN added — the frontend interceptor now sends this on unsafe methods
         config.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-XSRF-TOKEN"));
-        config.setAllowCredentials(true); // must match withCredentials: true on the frontend
+        config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
@@ -113,21 +112,13 @@ public class SecurityConfig {
 
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
-        // app.cookie.domain has been observed in the wild as a bare hostname
-        // ("focus.sohn.cloud"), a host:port ("localhost:5173"), and a full URL
-        // ("https://focus.sohn.cloud"). Cookie Domain attributes cannot contain a
-        // scheme, port, or path — passing any of those through verbatim either gets
-        // silently dropped by the browser (bad Domain) or throws IllegalArgumentException
-        // from ResponseCookie's RFC 6265 validation (e.g. "localhost:5173" -> invalid char ':').
-        // Normalize through URI so the host is reliably extracted regardless of format.
+
         String domain = resolveCookieDomain(appCookieDomain);
 
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         if (domain != null) {
             repository.setCookieCustomizer(cookie -> cookie.domain(domain));
         }
-        // if domain couldn't be resolved, leave it unset — Spring/Tomcat will default
-        // to a host-only cookie scoped to the exact request host, which still works.
         return repository;
     }
 
@@ -135,8 +126,6 @@ public class SecurityConfig {
         if (value == null || value.isBlank()) {
             return null;
         }
-        // URI.create() can't parse "host:port" or a bare hostname as an authority
-        // without a scheme prefix, so add one if it's missing before extracting the host.
         String normalized = value.contains("://") ? value : "http://" + value;
         return URI.create(normalized).getHost();
     }
