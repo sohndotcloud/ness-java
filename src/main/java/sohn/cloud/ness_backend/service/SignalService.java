@@ -1,5 +1,6 @@
 package sohn.cloud.ness_backend.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -20,7 +21,7 @@ public class SignalService {
         SignalRequest body = new SignalRequest(message, "+16027562858", List.of(recipient));
 
         restClient.post()
-            .uri("/v2/send")
+                .uri("/v2/send")
             .contentType(MediaType.APPLICATION_JSON)
             .body(body)
             .retrieve()
