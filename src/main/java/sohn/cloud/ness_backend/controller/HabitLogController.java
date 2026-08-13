@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import sohn.cloud.ness_backend.dto.ErrorResponse;
 import sohn.cloud.ness_backend.dto.HabitLogRequest;
 import sohn.cloud.ness_backend.dto.HabitLogResponse;
+import sohn.cloud.ness_backend.dto.SignalRequest;
 import sohn.cloud.ness_backend.entity.Habit;
 import sohn.cloud.ness_backend.entity.HabitLog;
 import sohn.cloud.ness_backend.exception.HabitLogRequestException;
@@ -17,6 +18,8 @@ import sohn.cloud.ness_backend.repo.HabitLogRepository;
 import sohn.cloud.ness_backend.repo.HabitRepository;
 import sohn.cloud.ness_backend.security.UserPrincipal;
 import sohn.cloud.ness_backend.service.HabitLogService;
+import sohn.cloud.ness_backend.service.SignalService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,15 +33,18 @@ public class HabitLogController {
     private final HabitLogService habitLogService;
     private final HabitRepository habitRepository;
     private final HabitLogRepository habitLogRepository;
+    private final SignalService signalService;
 
     public HabitLogController(
         HabitLogService habitLogService,
         HabitRepository habitRepository,
-        HabitLogRepository habitLogRepository
+        HabitLogRepository habitLogRepository,
+        SignalService signalService
     ) {
         this.habitLogService = habitLogService;
         this.habitRepository = habitRepository;
         this.habitLogRepository = habitLogRepository;
+        this.signalService = signalService;
     }
 
     @PostMapping
@@ -58,6 +64,7 @@ public class HabitLogController {
         ZoneId userZone = ZoneId.of(principal.getTimezone());
 
         HabitLog log = habitLogService.logCompletion(habit, request.date(), userZone, count);
+        signalService.sendMessage("+16027562858", "Testing number 1");
         return HabitLogResponse.from(log);
     }
 
