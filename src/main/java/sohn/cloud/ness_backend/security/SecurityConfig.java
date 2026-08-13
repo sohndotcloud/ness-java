@@ -113,10 +113,32 @@ public class SecurityConfig {
 
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
-        String domain = URI.create(appCookieDomain).getHost(); // "localhost"
+        // app.cookie.domain has been observed in the wild as a bare hostname
+        // ("focus.sohn.cloud"), a host:port ("localhost:5173"), and a full URL
+        // ("https://focus.sohn.cloud"). Cookie Domain attributes cannot contain a
+        // scheme, port, or path — passing any of those through verbatim either gets
+        // silently dropped by the browser (bad Domain) or throws IllegalArgumentException
+        // from ResponseCookie's RFC 6265 validation (e.g. "localhost:5173" -> invalid char ':').
+        // Normalize through URI so the host is reliably extracted regardless of format.
+        String domain = resolveCookieDomain(appCookieDomain);
+
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repository.setCookieCustomizer(cookie -> cookie.domain(domain));
+        if (domain != null) {
+            repository.setCookieCustomizer(cookie -> cookie.domain(domain));
+        }
+        // if domain couldn't be resolved, leave it unset — Spring/Tomcat will default
+        // to a host-only cookie scoped to the exact request host, which still works.
         return repository;
+    }
+
+    private static String resolveCookieDomain(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        // URI.create() can't parse "host:port" or a bare hostname as an authority
+        // without a scheme prefix, so add one if it's missing before extracting the host.
+        String normalized = value.contains("://") ? value : "http://" + value;
+        return URI.create(normalized).getHost();
     }
 
     private static final class CsrfCookieFilter extends OncePerRequestFilter {
