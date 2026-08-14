@@ -63,6 +63,7 @@ public class AuthController {
         User user = new User();
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
+        user.setName(request.name());
         user.setTimezone(request.timezone() != null ? request.timezone() : "UTC");
         userRepository.save(user);
 
