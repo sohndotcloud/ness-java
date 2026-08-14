@@ -7,6 +7,3 @@ CREATE TABLE password_reset_tokens (
 );
 
 CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
-
-ALTER TABLE user_sessions
-    ALTER COLUMN session_started_at SET NOT NULL;
