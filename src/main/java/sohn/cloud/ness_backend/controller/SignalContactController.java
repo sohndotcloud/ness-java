@@ -39,8 +39,8 @@ public class SignalContactController {
     }
 
     @GetMapping
-    public List<SignalContact> getContacts() {
-        return habitNotificationService.getContacts();
+    public List<SignalContact> getContacts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return habitNotificationService.getContacts(userPrincipal.getUser().getPhoneNumber());
     }
 
     @PostMapping

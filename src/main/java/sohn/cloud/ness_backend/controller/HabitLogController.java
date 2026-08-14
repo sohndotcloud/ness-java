@@ -30,9 +30,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/habits/{habitId}/logs")
 public class HabitLogController {
-    @Value("${signal.api.sender-number}")
-    private String sender;
-
     private final HabitLogService habitLogService;
     private final HabitRepository habitRepository;
     private final HabitLogRepository habitLogRepository;
@@ -75,7 +72,7 @@ public class HabitLogController {
             result = result.replace("${" + entry.getKey() + "}", entry.getValue());
         }
 
-        habitNotificationService.notifyContacts(habit, result);
+        habitNotificationService.notifyContacts(principal.getUser().getPhoneNumber(), habit, result);
 
         return HabitLogResponse.from(log);
     }

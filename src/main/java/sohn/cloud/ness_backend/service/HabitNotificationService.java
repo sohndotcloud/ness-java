@@ -26,14 +26,14 @@ public class HabitNotificationService {
         return signalContactRepository.save(contact);
     }
 
-    public void notifyContacts(Habit habit, String message) {
+    public void notifyContacts(String phoneNumber, Habit habit, String message) {
         for (SignalContact contact : habit.getSignalContacts()) {
-            signalApiClient.sendMessage(contact.getNumber(), message);
+            signalApiClient.sendMessage(phoneNumber, contact.getNumber(), message);
         }
     }
 
-    public List<SignalContact> getContacts() {
-        return signalApiClient.getContacts();
+    public List<SignalContact> getContacts(String phoneNumber) {
+        return signalApiClient.getContacts(phoneNumber);
     }
 
 }

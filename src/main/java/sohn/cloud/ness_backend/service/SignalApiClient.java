@@ -18,10 +18,7 @@ public class SignalApiClient {
     @Value("${signal.api.base-url}")
     private String baseUrl;
 
-    @Value("${signal.api.sender-number}")
-    private String senderNumber;
-
-    public void sendMessage(String recipientNumber, String message) {
+    public void sendMessage(String senderNumber, String recipientNumber, String message) {
         String url = baseUrl + "/v2/send";
         Map<String, Object> body = Map.of(
                 "message", message,
@@ -31,7 +28,7 @@ public class SignalApiClient {
         restTemplate.postForObject(url, body, Void.class);
     }
 
-    public List<SignalContact> getContacts() {
+    public List<SignalContact> getContacts(String senderNumber) {
         String url = baseUrl + "/v1/contacts/" + senderNumber;
         SignalContact[] contacts = restTemplate.getForObject(url, SignalContact[].class);
         return contacts != null ? Arrays.asList(contacts) : List.of();
