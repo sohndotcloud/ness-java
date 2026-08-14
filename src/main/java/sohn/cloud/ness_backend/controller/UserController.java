@@ -33,7 +33,7 @@ public class UserController {
         User user = new User();
         user.setEmail(request.email());
         user.setTimezone(request.timezone() != null ? request.timezone() : "UTC");
-
+        user.setPhoneNumber(request.phoneNumber());
         User saved = userRepository.save(user);
         return ResponseEntity
             .created(URI.create("/users/" + saved.getId()))
