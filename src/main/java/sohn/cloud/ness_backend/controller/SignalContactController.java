@@ -31,8 +31,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/contacts")
 public class SignalContactController {
-    @Value("${senderNumber}")
-    private String sender;
 
     private final HabitNotificationService habitNotificationService;
 
@@ -43,5 +41,11 @@ public class SignalContactController {
     @GetMapping
     public List<SignalContact> getContacts() {
         return habitNotificationService.getContacts();
-    } 
+    }
+
+    @PostMapping
+    public ResponseEntity<SignalContact> createContact(@RequestBody CreateSignalContactRequest request) {
+        SignalContact saved = habitNotificationService.saveContact(request.number(), request.name());
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
 }

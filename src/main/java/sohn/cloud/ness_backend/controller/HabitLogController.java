@@ -30,7 +30,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/habits/{habitId}/logs")
 public class HabitLogController {
-    @Value("${senderNumber}")
+    @Value("${signal.api.sender-number}")
     private String sender;
 
     private final HabitLogService habitLogService;
@@ -67,15 +67,15 @@ public class HabitLogController {
         ZoneId userZone = ZoneId.of(principal.getTimezone());
 
         HabitLog log = habitLogService.logCompletion(habit, request.date(), userZone, count);
-        String message = "${name} has completed task: ${task}. Today's streak is: ${count}";
-        Map<String, String> vars = Map.of("name", principal.getUser().getName(),
-                                    "task", log.getHabit().getName(),
+        String message = "Nils has completed task: ${task}. Today's streak is: ${count}";
+        Map<String, String> vars = Map.of("task", log.getHabit().getName(),
                                     "count", String.valueOf(count));
         String result = message;
         for (var entry : vars.entrySet()) {
             result = result.replace("${" + entry.getKey() + "}", entry.getValue());
         }
 
+        habitNotificationService.notifyContacts(habit, result);
 
         return HabitLogResponse.from(log);
     }
