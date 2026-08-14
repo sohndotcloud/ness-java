@@ -1,9 +1,12 @@
-ALTER TABLE user_sessions
-    ADD COLUMN session_started_at TIMESTAMPTZ;
+CREATE TABLE password_reset_tokens (
+                                       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                       token VARCHAR(255) NOT NULL UNIQUE,
+                                       expires_at TIMESTAMPTZ NOT NULL,
+                                       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
-UPDATE user_sessions
-SET session_started_at = issued_at
-WHERE session_started_at IS NULL;
+CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
 
 ALTER TABLE user_sessions
     ALTER COLUMN session_started_at SET NOT NULL;
