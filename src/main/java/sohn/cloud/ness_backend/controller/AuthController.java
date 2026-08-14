@@ -65,6 +65,7 @@ public class AuthController {
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setName(request.name());
         user.setTimezone(request.timezone() != null ? request.timezone() : "UTC");
+        user.setPhoneNumber(request.phoneNumber());
         userRepository.save(user);
 
         String accessToken = jwtService.generateToken(new UserPrincipal(user));
