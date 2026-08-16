@@ -61,12 +61,13 @@ public class HabitController {
 
         if (request.notify2() && request.signalContactNumbers() != null && !request.signalContactNumbers().isEmpty()) {
             Set<SignalContact> contacts = request.signalContactNumbers().stream()
-                    .map(number -> signalContactRepository.findByNumber(number)
-                            .orElseGet(() -> {
-                                SignalContact newContact = new SignalContact();
-                                newContact.setNumber(number);
-                                return signalContactRepository.save(newContact);
-                            }))
+                    .map(number -> {
+                        SignalContact contact = signalContactRepository.findByNumber(number)
+                                .orElseGet(SignalContact::new);
+                        contact.setNumber(number);
+                        contact.setMessage(request.message());
+                        return signalContactRepository.save(contact);
+                    })
                     .collect(Collectors.toSet());
 
             habit.setSignalContacts(contacts);

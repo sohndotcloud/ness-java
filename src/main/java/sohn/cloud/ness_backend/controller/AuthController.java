@@ -1,6 +1,7 @@
 package sohn.cloud.ness_backend.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -28,6 +29,18 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    // In prod (default): Secure=true, SameSite=Strict — cookie only travels over HTTPS.
+    // For local dev, set in application-local.properties:
+    //   app.cookie.secure=false
+    //   app.cookie.same-site=Lax
+    // Secure cookies are silently dropped by the browser over plain HTTP, so local
+    // must run with these overridden, not just with a different origin/port.
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site:Strict}")
+    private String cookieSameSite;
 
     private static final String REFRESH_COOKIE_NAME = "refreshToken";
 
@@ -149,11 +162,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
+
     private ResponseCookie buildRefreshCookie(String value, Duration maxAge) {
         return ResponseCookie.from(REFRESH_COOKIE_NAME, value)
                 .httpOnly(true)
-                .secure(true) // requires HTTPS — only disable for local http-only dev
-                .sameSite("Strict")
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
                 .path("/auth")
                 .maxAge(maxAge)
                 .build();

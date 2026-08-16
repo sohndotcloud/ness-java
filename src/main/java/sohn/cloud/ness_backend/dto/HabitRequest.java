@@ -8,5 +8,6 @@ public record HabitRequest(
         String frequency,
         Integer targetCount,
         boolean notify2,
-        List<String> signalContactNumbers
+        List<String> signalContactNumbers,
+        String message
 ) {}

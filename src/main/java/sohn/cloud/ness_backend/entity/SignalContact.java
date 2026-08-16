@@ -20,6 +20,9 @@ public class SignalContact {
     @Column(name = "display_name")
     private String name;
 
+    @Column(name = "message")
+    private String message;
+
     @ManyToMany(mappedBy = "signalContacts")
     private Set<Habit> habits = new HashSet<>();
 
@@ -45,5 +48,13 @@ public class SignalContact {
 
     public void setHabits(Set<Habit> habits) {
         this.habits = habits;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

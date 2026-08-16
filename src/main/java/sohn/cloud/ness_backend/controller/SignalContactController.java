@@ -45,7 +45,7 @@ public class SignalContactController {
 
     @PostMapping
     public ResponseEntity<SignalContact> createContact(@RequestBody CreateSignalContactRequest request) {
-        SignalContact saved = habitNotificationService.saveContact(request.number(), request.name());
+        SignalContact saved = habitNotificationService.saveContact(request.number(), request.name(), request.message());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 }

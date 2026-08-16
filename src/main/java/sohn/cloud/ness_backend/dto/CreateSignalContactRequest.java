@@ -1,4 +1,4 @@
 package sohn.cloud.ness_backend.dto;
 
-public record CreateSignalContactRequest(String number, String name) {
+public record CreateSignalContactRequest(String number, String name, String message) {
 }

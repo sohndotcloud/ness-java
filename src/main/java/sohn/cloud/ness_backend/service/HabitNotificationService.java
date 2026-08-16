@@ -19,16 +19,18 @@ public class HabitNotificationService {
         this.signalContactRepository = signalContactRepository;
     }
 
-    public SignalContact saveContact(String number, String name) {
+    public SignalContact saveContact(String number, String name, String message) {
         SignalContact contact = new SignalContact();
         contact.setNumber(number);
         contact.setName(name);
+        contact.setMessage(message);
         return signalContactRepository.save(contact);
     }
 
-    public void notifyContacts(String phoneNumber, Habit habit, String message) {
+    public void notifyContacts(String phoneNumber, Habit habit) {
         for (SignalContact contact : habit.getSignalContacts()) {
-            signalApiClient.sendMessage(phoneNumber, contact.getNumber(), message);
+            String message = contact.getMessage() == null ? habit.getName() + " has been completed!" : contact.getMessage();
+            signalApiClient.sendMessage(phoneNumber, contact.getNumber(), contact.getMessage());
         }
     }
 

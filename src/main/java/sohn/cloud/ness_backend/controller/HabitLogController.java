@@ -67,12 +67,8 @@ public class HabitLogController {
         String message = "${task} complete!\nToday's streak is: ${count}";
         Map<String, String> vars = Map.of("task", log.getHabit().getName(),
                                     "count", String.valueOf(count));
-        String result = message;
-        for (var entry : vars.entrySet()) {
-            result = result.replace("${" + entry.getKey() + "}", entry.getValue());
-        }
 
-        habitNotificationService.notifyContacts(principal.getUser().getPhoneNumber(), habit, result);
+        habitNotificationService.notifyContacts(principal.getUser().getPhoneNumber(), habit);
 
         return HabitLogResponse.from(log);
     }
